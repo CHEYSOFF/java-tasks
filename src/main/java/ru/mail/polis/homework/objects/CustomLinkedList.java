@@ -1,6 +1,7 @@
 package ru.mail.polis.homework.objects;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * 15 тугриков
@@ -9,6 +10,16 @@ import java.util.Iterator;
 public class CustomLinkedList implements Iterable<Integer> {
 
     private Node head;
+    private Node tail;
+    private Integer size_ = 0;
+
+    private Node getNode(int index) {
+        Node cur = tail;
+        for (int i = 0; i < index; i++) {
+            cur = cur.next;
+        }
+        return cur;
+    }
 
     /**
      * 1 тугрик
@@ -17,7 +28,7 @@ public class CustomLinkedList implements Iterable<Integer> {
      * @return size
      */
     public int size() {
-        return 0;
+        return size_;
     }
 
     /**
@@ -28,7 +39,15 @@ public class CustomLinkedList implements Iterable<Integer> {
      * @param value - data for create Node.
      */
     public void add(int value) {
-
+        Node newNode = new Node(value);
+        if (tail == null) {
+            tail = newNode;
+        } else {
+            head.next = newNode;
+        }
+        head = newNode;
+        head.next = null;
+        size_++;
     }
 
     /**
@@ -38,7 +57,11 @@ public class CustomLinkedList implements Iterable<Integer> {
      * @param index
      */
     public int get(int index) {
-       return 0;
+        if(index >= size()) {
+            throw new IndexOutOfBoundsException(index);
+        }
+        Node cur = getNode(index);
+        return cur.value;
     }
 
     /**
@@ -48,11 +71,25 @@ public class CustomLinkedList implements Iterable<Integer> {
      * Если был передан невалидный index - надо выкинуть исключение IndexOutOfBoundsException.
      * throw new IndexOutOfBoundsException(i);
      *
-     * @param i - index
+     * @param i     - index
      * @param value - data for create Node.
      */
     public void add(int i, int value) {
+        if(i == 0) {
+            Node newNode = new Node(value);
+            newNode.next = tail;
+            tail = newNode;
+            return;
+        }
 
+        if(i - 1 >= size() || i < 0) {
+            throw new IndexOutOfBoundsException(i - 1);
+        }
+        Node cur = getNode(i - 1);
+        Node newNode = new Node(value);
+        newNode.next = cur.next;
+        cur.next = newNode;
+        size_++;
     }
 
     /**
@@ -65,7 +102,20 @@ public class CustomLinkedList implements Iterable<Integer> {
      * @param index - position what element need remove.
      */
     public void removeElement(int index) {
-
+        if(index >= size() || index < 0) {
+            throw new IndexOutOfBoundsException(index);
+        }
+        if(index == 0) {
+            tail = tail.next;
+            if(size() == 1) {
+                head = null;
+            }
+        }
+        else {
+            Node prev = getNode(index - 1);
+            prev.next = prev.next.next;
+        }
+        size_--;
     }
 
     /**
@@ -73,26 +123,50 @@ public class CustomLinkedList implements Iterable<Integer> {
      * Реализовать метод:
      * Переворачивает все элементы списка.
      * Пример:
-     *  Исходная последовательность списка "1 -> 2 -> 3 -> 4 -> null"
-     *  После исполнения метода последовательность должна быть такой "4 -> 3 -> 2 -> 1 -> null"
+     * Исходная последовательность списка "1 -> 2 -> 3 -> 4 -> null"
+     * После исполнения метода последовательность должна быть такой "4 -> 3 -> 2 -> 1 -> null"
      */
     public void revertList() {
+        if(tail == null) {
+            return;
+        }
+        Node prev = null;
+        Node cur = tail;
+        while(cur != null) {
+            Node next = cur.next;
+            cur.next = prev;
 
+            prev = cur;
+            cur = next;
+        }
+        Node tmp = tail;
+        tail = head;
+        head = tmp;
     }
 
     /**
      * 1 тугрик
      * Метод выводит всю последовательность хранящуюся в списке начиная с head.
      * Формат вывода:
-     *  - значение каждой Node должно разделяться " -> "
-     *  - последовательность всегда заканчивается на null
-     *  - если в списке нет элементов - верните строку "null"
+     * - значение каждой Node должно разделяться " -> "
+     * - последовательность всегда заканчивается на null
+     * - если в списке нет элементов - верните строку "null"
      *
      * @return - String with description all list
      */
     @Override
     public String toString() {
-        return "1 -> 2 -> 3 -> null";
+        if(size() == 0) {
+            return "null";
+        }
+        StringBuilder ans = new StringBuilder(Integer.toString(tail.value) + " -> ");
+        Node cur = tail.next;
+        while(cur != null) {
+            ans.append(cur.value).append(" -> ");
+            cur = cur.next;
+        }
+        ans.append("null");
+        return ans.toString();
     }
 
     /**
@@ -103,7 +177,27 @@ public class CustomLinkedList implements Iterable<Integer> {
      */
     @Override
     public Iterator<Integer> iterator() {
-        return null;
+
+        return new Iterator<Integer>() {
+            Node node = tail;
+
+            @Override
+            public boolean hasNext() {
+                return node != null;
+            }
+
+            @Override
+            public Integer next() {
+                if(hasNext()) {
+                    Integer value = node.value;
+                    node = node.next;
+                    return value;
+                }
+                else {
+                    throw new NoSuchElementException();
+                }
+            }
+        };
     }
 
     private static class Node {
