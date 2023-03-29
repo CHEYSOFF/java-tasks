@@ -1,5 +1,6 @@
 package ru.mail.polis.homework.objects;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 /**
@@ -48,7 +49,45 @@ public class CustomArrayWrapper implements Iterable<Integer> {
      */
     @Override
     public Iterator<Integer> iterator() {
-        return null;
+        return new Iterator<>() {
+            Integer index = 0;
+
+            @Override
+            public boolean hasNext() {
+//                checkIndex(position);
+                return index < position;
+            }
+
+            @Override
+            public Integer next() {
+                checkIndex(index);
+                Integer ans = array[index];
+                index++;
+                return ans;
+            }
+        };
+    }
+
+    private Iterator<Integer> twoIterator(Integer start) {
+        return new Iterator<>() {
+            Integer index = start; // from 0 not 1
+
+            final Integer startPosition = position;
+            @Override
+            public boolean hasNext() {
+                checkModification(startPosition, position);
+                return index < position;
+            }
+
+            @Override
+            public Integer next() {
+                checkModification(startPosition, position);
+                checkIndex(index);
+                Integer ans = array[index];
+                index += 2;
+                return ans;
+            }
+        };
     }
 
     /**
@@ -58,7 +97,7 @@ public class CustomArrayWrapper implements Iterable<Integer> {
      * @return Iterator for EVEN elements
      */
     public Iterator<Integer> evenIterator() {
-        return null;
+        return twoIterator(1);
     }
 
     /**
@@ -68,9 +107,14 @@ public class CustomArrayWrapper implements Iterable<Integer> {
      * @return Iterator for ODD elements
      */
     public Iterator<Integer> oddIterator() {
-        return null;
+        return twoIterator(0);
     }
 
+    private void checkModification(int currentPosition, int previousPosition) {
+        if(currentPosition != previousPosition) {
+            throw new ConcurrentModificationException();
+        }
+    }
     private void checkIndex(int index) {
         if (index < 0 || index >= array.length) {
             throw new IndexOutOfBoundsException();
