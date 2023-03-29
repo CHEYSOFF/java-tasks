@@ -79,6 +79,7 @@ public class CustomLinkedList implements Iterable<Integer> {
             Node newNode = new Node(value);
             newNode.next = tail;
             tail = newNode;
+            size_++;
             return;
         }
 
@@ -111,9 +112,13 @@ public class CustomLinkedList implements Iterable<Integer> {
                 head = null;
             }
         }
-        else {
+        else{
             Node prev = getNode(index - 1);
             prev.next = prev.next.next;
+            if(index == size() - 1) {
+                head = prev;
+            }
+
         }
         size_--;
     }
