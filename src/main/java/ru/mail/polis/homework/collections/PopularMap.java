@@ -185,22 +185,20 @@ public class PopularMap<K, V> implements Map<K, V> {
         };
     }
 
-
+    private void increaseSmth(Object obj, Map<Object, Integer> map) {
+        Integer newValue = 0;
+        if(map.containsKey(obj)) {
+            newValue = map.get(obj);
+        }
+        map.put(obj, newValue + 1);
+    }
 
     private void increaseKey(Object key) {
-        Integer newValue = 0;
-        if(popularityKey.containsKey(key)) {
-            newValue = popularityKey.get(key);
-        }
-        popularityKey.put((K) key, newValue + 1);
+        increaseSmth(key, (Map<Object, Integer>) popularityKey);
     }
 
     private void increaseValue(Object value) {
-        Integer newValue = 0;
-        if(popularityValue.containsKey(value)) {
-            newValue = popularityValue.get(value);
-        }
-        popularityValue.put((V) value, newValue + 1);
+        increaseSmth(value, (Map<Object, Integer>) popularityValue);
     }
 
 }
