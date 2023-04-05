@@ -132,7 +132,8 @@ public class PopularMapTest {
         popularMap1.put(key2, value2);
         popularMap1.get(key2);
         popularMap1.remove(key2);
-        popularMap1.remove(key1);
+        popularMap1.put(key1, value1);
+//        popularMap1.remove(key1);
         popularMap1.put(key1, value3);
         popularMap1.put(key2, value3);
         popularMap1.get(key2);
